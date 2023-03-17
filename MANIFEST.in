@@ -1,0 +1,4 @@
+recursive-include DePTH/data *
+include DESCRIPTION
+include LICENSE.txt
+include REAME.md
