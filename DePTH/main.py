@@ -5,7 +5,7 @@ def parse_args():
     description=\
     "DePTH: a neural network model for sequence-based TCR and HLA association prediction",
         prog='DePTH')
-    subparser = parser.add_subparsers(help='whether to train or predict', dest='command')
+    subparser = parser.add_subparsers(help='whether to train, predict or do cross-validation', dest='command')
 
     # --------------------------------
     # Parser for training a model
@@ -19,8 +19,8 @@ def parse_args():
                         choices=['HLA_I', 'HLA_II'])
     train_parser.add_argument('--data_dir', required=True, type=str,
                         help='directory where training and validation data files are located')
-    train_parser.add_argument('--model_dir', type=str,
-                        help='the path to the folder to hold the data encoders and trained model, '\
+    train_parser.add_argument('--model_dir', required=True, type=str,
+                        help='the path to the folder to hold the trained model, '\
                         'should not include ".." as part of the path')
     train_parser.add_argument('--enc_method', type=str, default='one_hot',
                         help='encoding method for amino acid, can be one of one_hot, blosum62, atchley, and pca',
@@ -70,7 +70,8 @@ def parse_args():
                         help='the path to the folder containing the trained model, '\
                              'should not be provided if default_model is "True"')
     predict_parser.add_argument('--enc_method', required=False, type=str,
-                        help='encoding method for amino acid, can be one of one_hot, blosum62, atchley, and pca',
+                        help='encoding method for amino acid, can be one of one_hot, blosum62, atchley, and pca.'\
+                        ' Must be consistent with the one used for training the model',
                         choices=['one_hot', 'blosum62', 'atchley', 'pca'])
 
 
