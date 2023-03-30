@@ -41,6 +41,7 @@ def cv(hla_class, data_dir, average_valid_dir, enc_method,
     if len(n_units) != n_dense:
         sys.exit("Error: n_dense and n_units do not match.")
 
+    print("arguments after format processing are: ")
     print("HLA_class = ", hla_class)
     print("data_dir = ", data_dir)
     print("average_valid_dir = ", average_valid_dir)
@@ -75,16 +76,14 @@ def cv(hla_class, data_dir, average_valid_dir, enc_method,
           y2_valid, n_pos_valid, n_neg_valid)) = \
             _utils.get_data(hla_class, data_dir, enc_method, True)
 
-        print(HLA_encoded_train.shape)
-        print(HLA_encoded_valid.shape)
-        print(CDR3_encoded_train.shape)
-        print(CDR3_len_train.shape)
-        print(cdr1_encoded_train.shape)
-        print(cdr2_encoded_train.shape)
-        print(cdr25_encoded_train.shape)
-        print(y2_train.shape)
-
-        print(HLA_encoded_train[0][6])
+        print("shape of encoded HLA sequence from training data: ", HLA_encoded_train.shape)
+        print("shape of encoded HLA sequence from validation data: ", HLA_encoded_valid.shape)
+        print("shape of encoded CDR3 sequence from training data: ", CDR3_encoded_train.shape)
+        print("shape of encoded CDR3 length part from training data: ", CDR3_len_train.shape)
+        print("shape of encoded CDR1 sequence from training data: ", cdr1_encoded_train.shape)
+        print("shape of encoded CDR2 sequence from training data: ", cdr2_encoded_train.shape)
+        print("shape of encoded CDR2.5 sequencefrom training data: ", cdr25_encoded_train.shape)
+        print("shape of label from training data: ", y2_train.shape)
 
         tf.keras.backend.clear_session()
         # get the model
