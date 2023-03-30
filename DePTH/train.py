@@ -41,6 +41,7 @@ def train(hla_class, data_dir, model_dir, enc_method,
     if len(n_units) != n_dense:
         sys.exit("Error: n_dense and n_units do not match.")
 
+    print("arguments after processing are: ")
     print("data_dir = ", data_dir)
     print("model_dir = ", model_dir)
     print("enc_method = ", enc_method)
@@ -70,26 +71,26 @@ def train(hla_class, data_dir, model_dir, enc_method,
       y2_valid, n_pos_valid, n_neg_valid)) = \
         _utils.get_data(hla_class, data_dir, enc_method, False)
 
-    print(HLA_encoded_train.shape)
-    print(HLA_encoded_valid.shape)
-    print(CDR3_encoded_train.shape)
-    print(CDR3_len_train.shape)
-    print(cdr1_encoded_train.shape)
-    print(cdr2_encoded_train.shape)
-    print(cdr25_encoded_train.shape)
-    print(y2_train.shape)
+    print("shape of encoded HLA part from training data: ", HLA_encoded_train.shape)
+    print("shape of encoded HLA part from validation data: ", HLA_encoded_valid.shape)
+    print("shape of encoded CDR3 part from training data: ", CDR3_encoded_train.shape)
+    print("shape of encoded CDR3 length part from training data: ", CDR3_len_train.shape)
+    print("shape of encoded CDR1 part from training data: ", cdr1_encoded_train.shape)
+    print("shape of encoded CDR2 part from training data: ", cdr2_encoded_train.shape)
+    print("shape of encoded CDR2.5 part from training data: ", cdr25_encoded_train.shape)
+    print("shape of encoded label from training data: ", y2_train.shape)
 
     # get the model
     model = _utils.get_model(HLA_shape=HLA_encoded_train.shape[1:],
-                       CDR3_shape=CDR3_encoded_train.shape[1:],
-                       len_shape=CDR3_len_train.shape[1:],
-                       cdr1_shape=cdr1_encoded_train.shape[1:],
-                       cdr2_shape=cdr2_encoded_train.shape[1:],
-                       cdr25_shape=cdr25_encoded_train.shape[1:],
-                       n_dense=n_dense,
-                       n_units=n_units,
-                       dropout_flag=dropout_flag,
-                       p_dropout=p_dropout)
+                             CDR3_shape=CDR3_encoded_train.shape[1:],
+                             len_shape=CDR3_len_train.shape[1:],
+                             cdr1_shape=cdr1_encoded_train.shape[1:],
+                             cdr2_shape=cdr2_encoded_train.shape[1:],
+                             cdr25_shape=cdr25_encoded_train.shape[1:],
+                             n_dense=n_dense,
+                             n_units=n_units,
+                             dropout_flag=dropout_flag,
+                             p_dropout=p_dropout)
 
     model.summary()
 

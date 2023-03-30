@@ -287,8 +287,8 @@ def encode(pairs_ori, enc_method, allele_dict, hla_len, HLA_enc, CDR3len_enc, CD
 
     if len(set([name for _, name in pairs_ori]) - set(allele_dict.keys())) > 0:
         sys.exit("Some pairs have HLA not satisfying the format requirements. "\
-                 "For hla_class=HLA_I, the HLAs should be in table HLA_I_pseudo_40.csv."\
-                 "For hla_class=HLA_II, the HLAs should be in table HLA_II_pseudo_45.csv.")
+                 "For hla_class='HLA_I', the HLAs should be in table HLA_I_pseudo_40.csv."\
+                 "For hla_class='HLA_II', the HLAs should be in table HLA_II_pseudo_45.csv.")
     # encode
     # HLA
     HLA_aa_list = [allele_dict[name] for _, name in pairs_ori]
@@ -427,37 +427,37 @@ def get_model(HLA_shape, CDR3_shape, len_shape, cdr1_shape, cdr2_shape, cdr25_sh
               n_dense, n_units, dropout_flag, p_dropout):
 
     # Define input layers
-    HLA_input = Input(HLA_shape)
+    HLA_input = Input(HLA_shape, name="HLA")
     HLA_reshape = Reshape((HLA_shape[0] * HLA_shape[1],),
-                          input_shape=HLA_shape)(HLA_input)
-    CDR3_input = Input(CDR3_shape)
-    len_input = Input(len_shape)
-    cdr1_input = Input(cdr1_shape)
-    cdr2_input = Input(cdr2_shape)
-    cdr25_input = Input(cdr25_shape)
+                          input_shape=HLA_shape, name="HLA_reshape")(HLA_input)
+    CDR3_input = Input(CDR3_shape, name="CDR3")
+    len_input = Input(len_shape, name="CDR3_len")
+    cdr1_input = Input(cdr1_shape, name="CDR1")
+    cdr2_input = Input(cdr2_shape, name="CDR2")
+    cdr25_input = Input(cdr25_shape, name="CDR2.5")
     cdr1_reshape = Reshape((cdr1_shape[0] * cdr1_shape[1],),
-                           input_shape=cdr1_shape)(cdr1_input)
+                           input_shape=cdr1_shape, name="CDR1_reshape")(cdr1_input)
     cdr2_reshape = Reshape((cdr2_shape[0] * cdr2_shape[1],),
-                           input_shape=cdr2_shape)(cdr2_input)
+                           input_shape=cdr2_shape, name="CDR2_reshape")(cdr2_input)
     cdr25_reshape = Reshape((cdr25_shape[0] * cdr25_shape[1],),
-                            input_shape=cdr25_shape)(cdr25_input)
+                            input_shape=cdr25_shape, name="CDR2.5_reshape")(cdr25_input)
 
     # construct CDR3_branches
     CDR3_branch = Conv1D(filters=8, kernel_size=2, activation=relu,
-                         input_shape=CDR3_shape, name='Conv_CDR3_1')(CDR3_input)
+                         input_shape=CDR3_shape, name='CDR3_conv')(CDR3_input)
     CDR3_branch = MaxPooling1D(pool_size=2, strides=1, padding='valid',
-                               name='MaxPooling_CDR3_1')(CDR3_branch)
-    CDR3_flatten = Flatten(name='Flatten_CDR3')(CDR3_branch)
+                               name='CDR3_maxpooling')(CDR3_branch)
+    CDR3_flatten = Flatten(name='CDR3_flatten')(CDR3_branch)
     CDR3_reshape = Reshape((CDR3_shape[0] * CDR3_shape[1],),
-                           input_shape=CDR3_shape)(CDR3_input)
+                           input_shape=CDR3_shape, name="CDR3_reshape")(CDR3_input)
     CDR3_inter_layer = concatenate([CDR3_flatten, CDR3_reshape], axis=-1)
 
     # concatenate parts together
-    HLA_part = Dense(64, activation=relu)(HLA_reshape)
+    HLA_part = Dense(64, activation=relu, name="HLA_dense")(HLA_reshape)
 
     TCR_combined = concatenate([len_input, CDR3_inter_layer,
                                 cdr1_reshape, cdr2_reshape, cdr25_reshape])
-    TCR_part = Dense(64, activation=relu)(TCR_combined)
+    TCR_part = Dense(64, activation=relu, name="TCR_dense")(TCR_combined)
 
     inter_layer = concatenate([HLA_part, TCR_part])
 
@@ -465,18 +465,18 @@ def get_model(HLA_shape, CDR3_shape, len_shape, cdr1_shape, cdr2_shape, cdr25_sh
     # and whether we want a dropout layer
     if n_dense == 1:
         if not dropout_flag:
-            last_layer = Dense(n_units[0], activation=relu)(inter_layer)
+            last_layer = Dense(n_units[0], activation=relu, name="pair_dense")(inter_layer)
         else:
-            dense_layer = Dense(n_units[0], activation=relu)(inter_layer)
+            dense_layer = Dense(n_units[0], activation=relu, name="pair_dense")(inter_layer)
             last_layer = Dropout(p_dropout)(dense_layer)
     else:
         if not dropout_flag:
-            first_dense = Dense(n_units[0], activation=relu)(inter_layer)
-            last_layer = Dense(n_units[1], activation=relu)(first_dense)
+            first_dense = Dense(n_units[0], activation=relu, name="pair_dense1")(inter_layer)
+            last_layer = Dense(n_units[1], activation=relu, name="pair_dense2")(first_dense)
         else:
-            first_dense = Dense(n_units[0], activation=relu)(inter_layer)
+            first_dense = Dense(n_units[0], activation=relu, name="pair_dense1")(inter_layer)
             dropout_layer = Dropout(p_dropout)(first_dense)
-            last_layer = Dense(n_units[1], activation=relu)(dropout_layer)
+            last_layer = Dense(n_units[1], activation=relu, name="pair_dense2")(dropout_layer)
     # final output layer
     output = Dense(1, activation='sigmoid', name='output')(last_layer)
     # build the model
