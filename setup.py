@@ -65,9 +65,9 @@ setuptools.setup(
     package_data={'DePTH': data_file_list},
     python_requires = ">=3.9",
     install_requires=[
-        'scikit-learn >= 1.0.2',
-        'tensorflow >= 2.4.1',
-        'pandas >= 1.4.2',
-        'numpy >= 1.21.5',
+        'scikit-learn>=1.0.2',
+        'tensorflow>=2.4.1,<2.15.1',
+        'pandas>=1.4.2',
+        'numpy>=1.21.5',
         ]
 )
