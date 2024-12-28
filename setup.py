@@ -29,11 +29,22 @@ for cur_seeds in seeds_list:
     for core_name in ["HLA_I_all_match", "HLA_II_all_match"]:
         full_name = core_name+"_model_"+"_".join(cur_seeds)
         data_file_list += \
+             ['data/trained_models_legacy/'+core_name+'/'+full_name+'/assets/*', \
+              'data/trained_models_legacy/'+core_name+'/'+full_name+'/fingerprint.pb', \
+              'data/trained_models_legacy/'+core_name+'/'+full_name+'/keras_metadata.pb', \
+              'data/trained_models_legacy/'+core_name+'/'+full_name+'/saved_model.pb', \
+              'data/trained_models_legacy/'+core_name+'/'+full_name+'/variables/*']
+
+for cur_seeds in seeds_list:
+    for core_name in ["HLA_I", "HLA_II"]:
+        full_name = "model_"+"_".join(cur_seeds)
+        data_file_list += \
              ['data/trained_models/'+core_name+'/'+full_name+'/assets/*', \
               'data/trained_models/'+core_name+'/'+full_name+'/fingerprint.pb', \
               'data/trained_models/'+core_name+'/'+full_name+'/keras_metadata.pb', \
               'data/trained_models/'+core_name+'/'+full_name+'/saved_model.pb', \
               'data/trained_models/'+core_name+'/'+full_name+'/variables/*']
+
 
 setuptools.setup(
     name = "DePTH",

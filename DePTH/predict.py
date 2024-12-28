@@ -22,7 +22,8 @@ def predict(test_file, hla_class, output_dir, default_model, model_dir=None, enc
     input_args = locals()
     print("input args are", input_args)
 
-    default_model = (default_model == 'True')
+    legacy_flag = (default_model == 'legacy')
+    default_model = (default_model in ['True', 'legacy'])
 
     if default_model:
         enc_method = 'one_hot'
@@ -78,8 +79,12 @@ def predict(test_file, hla_class, output_dir, default_model, model_dir=None, enc
         for cur_seeds in seeds_list:
 
             tf.keras.backend.clear_session()
-            cur_model_folder = hla_class+"_all_match/"+hla_class+"_all_match_model_"+"_".join(cur_seeds)
-            cur_model_path = pkg_resources.resource_filename(__name__, 'data/trained_models/'+cur_model_folder)
+            if legacy_flag:
+                cur_model_folder = hla_class+"_all_match/"+hla_class+"_all_match_model_"+"_".join(cur_seeds)
+                cur_model_path = pkg_resources.resource_filename(__name__, 'data/trained_models_legacy/'+cur_model_folder)
+            else:
+                cur_model_folder = hla_class+"/"+"model_"+"_".join(cur_seeds)
+                cur_model_path = pkg_resources.resource_filename(__name__, 'data/trained_models/'+cur_model_folder)                
             #with resources.path('DePTH.data', default_model_folder) as default_model_path:
             print("model path is: ", cur_model_path)
             cur_model = tf.keras.models.load_model(cur_model_path)

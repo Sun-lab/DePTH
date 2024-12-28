@@ -63,9 +63,11 @@ def parse_args():
                         help='path to the folder to put the file with predicted scores,'\
                              ' should not include ".." as part of the path')
     predict_parser.add_argument('--default_model', required=False, default='True',
-                        help='whether to use the default trained model or not, a model directory '\
+                        help='What model to use. Three options: the default trained model v2.0 ("True"),' \
+                             'the legacy default trained model v1.0 ("legacy"), or model trained by the user ("False").' \
+                             'A model directory '\
                              'and the enc_method used for training the model must be provided if default_model is "False"',
-                        choices=['True', 'False'])
+                        choices=['True', 'False', 'legacy'])
     predict_parser.add_argument('--model_dir', required=False, type=str,
                         help='the path to the folder containing the trained model, '\
                              'should not be provided if default_model is "True"')
@@ -153,12 +155,12 @@ def main():
             print("Creating output directory: %s" % args.output_dir)
             os.makedirs(args.output_dir, exist_ok=False)
 
-        if args.default_model == "True":
+        if args.default_model in ["True", "legacy"]:
             if args.model_dir is not None:
-                sys.exit("When the default model in the package is used, no model_dir should be passed.")
+                sys.exit("When the default model (or legacy default model) in the package is used, no model_dir should be passed.")
             if args.enc_method != None:
                 if args.enc_method != "one_hot":
-                    sys.exit("When the default model in the package is used, enc_method should be one_hot.")
+                    sys.exit("When the default model (or legacy default model) in the package is used, enc_method should be one_hot.")
         else:
             if not os.path.exists(args.model_dir):
                 sys.exit("The folder containing trained model does not exist. Please provide one. This can be done by running 'DePTH train' first to produce it.")
