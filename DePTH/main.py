@@ -63,11 +63,16 @@ def parse_args():
                         help='path to the folder to put the file with predicted scores,'\
                              ' should not include ".." as part of the path')
     predict_parser.add_argument('--default_model', required=False, default='True',
-                        help='What model to use. Three options: the default trained model v2.0 ("True"),' \
-                             'the legacy default trained model v1.0 ("legacy"), or model trained by the user ("False").' \
-                             'A model directory '\
-                             'and the enc_method used for training the model must be provided if default_model is "False"',
-                        choices=['True', 'False', 'legacy'])
+                        help='What model to use. Five options: the default trained model v2.1 ("True"),' \
+                             'the legacy default trained model v2.0 ("legacy2.0"), ' \
+                             'the legacy default trained model v1.0 ("legacy1.0" or "legacy"), ' \
+                             'or model trained by the user ("False").' \
+                             'A model directory ' \
+                             'and the enc_method used for training the model must be provided if default_model is "False".' \
+                             'Compared with DePTH2.0, DePTH2.1 only updates the default models for HLA-I, ' \
+                             'and the default models for HLA-II are the same as those from DePTH2.0.' \
+                             'For the consideration of backward compatibility, specifying "legacy1.0" or "legacy" both give models from legacy1.0.',
+                        choices=['True', 'False', 'legacy2.0', 'legacy1.0', 'legacy'])
     predict_parser.add_argument('--model_dir', required=False, type=str,
                         help='the path to the folder containing the trained model, '\
                              'should not be provided if default_model is "True"')
@@ -155,7 +160,7 @@ def main():
             print("Creating output directory: %s" % args.output_dir)
             os.makedirs(args.output_dir, exist_ok=False)
 
-        if args.default_model in ["True", "legacy"]:
+        if args.default_model in ["True", "legacy2.0", "legacy1.0", "legacy"]:
             if args.model_dir is not None:
                 sys.exit("When the default model (or legacy default model) in the package is used, no model_dir should be passed.")
             if args.enc_method != None:

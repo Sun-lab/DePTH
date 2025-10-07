@@ -22,10 +22,10 @@ def predict(test_file, hla_class, output_dir, default_model, model_dir=None, enc
     input_args = locals()
     print("input args are", input_args)
 
-    legacy_flag = (default_model == 'legacy')
-    default_model = (default_model in ['True', 'legacy'])
+    legacy_flag = (default_model in ['legacy2.0', 'legacy1.0', 'legacy'])
+    default_model_flag = (default_model in ['True', 'legacy2.0', 'legacy1.0', 'legacy'])
 
-    if default_model:
+    if default_model_flag:
         enc_method = 'one_hot'
     # load pair list
     df_pair = pd.read_csv(test_file, header=0)
@@ -50,7 +50,7 @@ def predict(test_file, hla_class, output_dir, default_model, model_dir=None, enc
     print(cdr2_encoded.shape)
     print(cdr25_encoded.shape)
 
-    if default_model:
+    if default_model_flag:
 
         print("Get average prediction scores from 20 models")
 
@@ -80,13 +80,25 @@ def predict(test_file, hla_class, output_dir, default_model, model_dir=None, enc
 
             tf.keras.backend.clear_session()
             if legacy_flag:
-                cur_model_folder = hla_class+"_all_match/"+hla_class+"_all_match_model_"+"_".join(cur_seeds)
-                cur_model_path = pkg_resources.resource_filename(__name__, 'data/trained_models_legacy/'+cur_model_folder)
+                if default_model == 'legacy2.0':
+                    cur_model_folder = hla_class+"/"+"model_"+"_".join(cur_seeds)
+                    cur_model_path = pkg_resources.resource_filename(__name__, 'data/trained_models_legacy2.0/'+cur_model_folder)
+                elif default_model in ['legacy1.0', 'legacy']:
+                    cur_model_folder = hla_class+"_all_match/"+hla_class+"_all_match_model_"+"_".join(cur_seeds)
+                    cur_model_path = pkg_resources.resource_filename(__name__, 'data/trained_models_legacy1.0/'+cur_model_folder)                    
             else:
-                cur_model_folder = hla_class+"/"+"model_"+"_".join(cur_seeds)
-                cur_model_path = pkg_resources.resource_filename(__name__, 'data/trained_models/'+cur_model_folder)                
+                if hla_class == "HLA_I":
+                    cur_model_folder = hla_class+"/"+"model_"+"_".join(cur_seeds)
+                    cur_model_path = pkg_resources.resource_filename(__name__, 'data/trained_models/'+cur_model_folder)      
+                else:
+                    cur_model_folder = hla_class+"/"+"model_"+"_".join(cur_seeds)
+                    cur_model_path = pkg_resources.resource_filename(__name__, 'data/trained_models_legacy2.0/'+cur_model_folder)
             #with resources.path('DePTH.data', default_model_folder) as default_model_path:
             print("model path is: ", cur_model_path)
+            if not legacy_flag:
+                if hla_class == "HLA_II":
+                    print("the model path is from the folder for legacy2.0. This is because compared with DePTH2.0, ")
+                    print("DePTH2.1 only updates the HLA-I default models, and HLA-II default models remain the same as those from DePTH2.0")
             cur_model = tf.keras.models.load_model(cur_model_path)
             cur_yhat = cur_model.predict(components_test)
             sum_yhat = np.add(sum_yhat, cur_yhat)
